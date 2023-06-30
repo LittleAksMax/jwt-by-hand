@@ -1,0 +1,23 @@
+{
+  "name": "jwt-by-hand",
+  "version": "1.0.0",
+  "description": "My attempt at implementing JWT authentication and token generation by hand.",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/chalk": "^2.2.0",
+    "@types/node": "^20.3.2",
+    "chalk": "4.1.2",
+    "crypto": "^1.0.1",
+    "typescript": "^5.1.6"
+  },
+  "devDependencies": {
+    "prettier": "^2.8.8",
+    "ts-node": "^10.9.1"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node ./bin/index.js",
+    "dev": "ts-node ./src/index.ts"
+  }
+}
