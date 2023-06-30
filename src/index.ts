@@ -1,27 +1,29 @@
-import Encoder from './jwt/encoder';
-import TokenFactory from './jwt/tokenFactory';
-import { Header, Payload } from './types/token';
+import IdentityController from './auth/identityController';
+import JwtToken from './jwt/token';
 
-const encoder: Encoder = new Encoder();
-const factory: TokenFactory = new TokenFactory(encoder);
+const idController: IdentityController = new IdentityController();
 
-const header: Header = {
-  alg: 'HS256',
-  typ: 'JWT',
-};
+const jwtToken: JwtToken | null = idController.register(
+  'test.email@testemail.com',
+  'StrongPassword123!'
+);
 
-const payload: Payload = {
-  sub: 'da169f91-be98-4185-a6f9-be0067faf29d', // random GUID
-  iss: 'issuer',
-  exp: 1200,
-  iat: 1688079349,
-  aud: 'audience',
-  jti: 'e03658a9-6c27-4379-8eee-8da8fd2250f2', // random GUID
-};
+// prints out token
+if (jwtToken === null) {
+  console.log('Null token. Error in registration');
+} else {
+  console.log(jwtToken.toString());
+}
 
-// must be 256-bit
-// keep this secret
-// I pulled this from some random generator website
-const secretKey: string = 'U1bCHsMZfSSwzplfaIMVaHmZG3BmLafc';
+// re-registering with same credentials
+const jwtToken2: JwtToken | null = idController.register(
+  'test.email@testemail.com',
+  'StrongPassword123!'
+);
 
-console.log(factory.create(header, payload, secretKey).toString());
+// prints out null token error.
+if (jwtToken2 === null) {
+  console.log('Null token. Error in registration');
+} else {
+  console.log(jwtToken2.toString());
+}
