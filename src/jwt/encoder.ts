@@ -1,3 +1,6 @@
+/**
+ * This is just a class that can encode strings into base64url format.
+ */
 export default class Encoder {
   public base64UrlEncode = (toEncode: string): string => {
     // Buffer.from(str).toString('base64url') just creates a buffer

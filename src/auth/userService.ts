@@ -6,8 +6,8 @@ class UserService {
   public createUser = (email: string, password: string): User | null => {
     const users: User[] = userData.filter((x) => x.email === email);
     if (users.length !== 0) {
-      // should not match any users
-      return null; // conflict
+      // should not match any pre-existing users
+      return null; // conflict error
     }
 
     const newUser: User = { id: uuidv4(), email, password };

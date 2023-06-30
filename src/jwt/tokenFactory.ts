@@ -3,7 +3,6 @@ import { IHashHandler } from './hashHandlers';
 import Encoder from './encoder';
 import HashMediator from './hashMediator';
 import JwtToken from './token';
-import { createHmac } from 'crypto';
 
 export interface ITokenFactory {
   create: (
@@ -14,7 +13,7 @@ export interface ITokenFactory {
   ) => JwtToken;
 }
 
-export default class TokenFactory implements ITokenFactory {
+class TokenFactory implements ITokenFactory {
   private _encoder: Encoder;
   private _mediator: HashMediator;
 
@@ -34,6 +33,7 @@ export default class TokenFactory implements ITokenFactory {
     const sPayload: string = JSON.stringify(payload);
     const encodedPayload: string = this._encoder.base64UrlEncode(sPayload);
 
+    // find hash handler based on algorithm specified in header.
     const hashHandler: IHashHandler | null = this._mediator.provideHandler(
       header.alg
     );
@@ -52,3 +52,5 @@ export default class TokenFactory implements ITokenFactory {
     return new JwtToken(encodedHeader, encodedPayload, signature);
   };
 }
+
+export default TokenFactory;
