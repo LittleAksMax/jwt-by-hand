@@ -7,14 +7,14 @@ import { HS256Handler, IHashHandler } from './hashHandlers';
  * algorithms much easier.
  */
 class HashMediator {
-  provideHandler = (hashType: string): IHashHandler | null => {
+  provideHandler = (hashType: string): IHashHandler => {
     switch (hashType) {
       // add other cases for other algorithms, each with their own
       // handler instance
       case 'HS256':
         return new HS256Handler();
       default:
-        return null;
+        throw new Error('Unknown hash type: ' + hashType);
     }
   };
 }

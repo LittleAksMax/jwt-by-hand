@@ -1,14 +1,28 @@
 import chalk from 'chalk';
 
 class JwtToken {
-  header: string;
-  payload: string;
-  signature: string;
+  private _header: string;
+  private _payload: string;
+  private _signature: string;
 
-  constructor(header: string, payload: string, signature: string) {
-    this.header = header;
-    this.payload = payload;
-    this.signature = signature;
+  /* GETTERS for the header, payload and signature */
+  public get header(): string {
+    return this._header;
+  }
+
+  public get payload(): string {
+    return this._payload;
+  }
+
+  public get signature(): string {
+    return this._signature;
+  }
+  /* */
+
+  constructor(header: string, payload: string, _signature: string) {
+    this._header = header;
+    this._payload = payload;
+    this._signature = _signature;
   }
 
   toString = (coloured: boolean = true): string => {
@@ -18,7 +32,7 @@ class JwtToken {
     const red = coloured ? chalk.red : () => emptyWrapper;
     const mag = coloured ? chalk.magenta : () => emptyWrapper;
     const blu = coloured ? chalk.blueBright : () => emptyWrapper;
-    return `${red(this.header)}.${mag(this.payload)}.${blu(this.signature)}`;
+    return `${red(this._header)}.${mag(this._payload)}.${blu(this._signature)}`;
   };
 }
 

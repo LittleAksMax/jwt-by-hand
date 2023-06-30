@@ -1,6 +1,6 @@
 import { Header, Payload } from '../types/token';
 import { IHashHandler } from './hashHandlers';
-import Encoder from './encoder';
+import { Encoder } from './coders';
 import HashMediator from './hashMediator';
 import JwtToken from './token';
 
@@ -26,7 +26,7 @@ class TokenFactory implements ITokenFactory {
     header: Header,
     payload: Payload,
     secretKey: string,
-    base64EncodeSecretKey: boolean = true
+    base64EncodeSecretKey: boolean = false
   ): JwtToken => {
     const sHeader: string = JSON.stringify(header);
     const encodedHeader: string = this._encoder.base64UrlEncode(sHeader);
