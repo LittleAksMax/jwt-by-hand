@@ -10,7 +10,7 @@ class UserService {
       return null; // conflict error
     }
 
-    const newUser: User = { id: uuidv4(), email, password };
+    const newUser: User = { id: uuidv4(), email, password, admin: false };
 
     userData.push(newUser); // add user to 'database'
 

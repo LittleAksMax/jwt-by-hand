@@ -60,6 +60,10 @@ class IdentityService {
       roles: [],
     };
 
+    if (user.admin) {
+      payload.roles.push('Admin');
+    }
+
     return this._tokFactory.create(header, payload, this._secretKey);
   };
 }
