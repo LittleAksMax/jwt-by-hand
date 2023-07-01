@@ -7,12 +7,18 @@ import { HS256Handler, IHashHandler } from './hashHandlers';
  * algorithms much easier.
  */
 class HashMediator {
+  private _hs256Handler: HS256Handler;
+
+  constructor(hs256Handler: HS256Handler) {
+    this._hs256Handler = hs256Handler;
+  }
+
   provideHandler = (hashType: string): IHashHandler => {
     switch (hashType) {
       // add other cases for other algorithms, each with their own
       // handler instance
       case 'HS256':
-        return new HS256Handler();
+        return this._hs256Handler;
       default:
         throw new Error('Unknown hash type: ' + hashType);
     }

@@ -19,10 +19,10 @@ class JwtToken {
   }
   /* */
 
-  constructor(header: string, payload: string, _signature: string) {
+  constructor(header: string, payload: string, signature: string) {
     this._header = header;
     this._payload = payload;
-    this._signature = _signature;
+    this._signature = signature;
   }
 
   toString = (coloured: boolean = true): string => {

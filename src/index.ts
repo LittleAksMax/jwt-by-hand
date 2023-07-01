@@ -1,7 +1,11 @@
 import IdentityController from './api/auth/identityController';
+import IdentityService from './api/auth/identityService';
+import UserService from './api/auth/userService';
 import DataController from './api/data/dataController';
 import { Data } from './api/data/models';
 import { Decoder, Encoder } from './jwt/coders';
+import { HS256Handler } from './jwt/hashHandlers';
+import HashMediator from './jwt/hashMediator';
 import JwtToken from './jwt/token';
 import TokenFactory from './jwt/tokenFactory';
 import TokenVerifier from './jwt/tokenVerifier';
@@ -9,19 +13,22 @@ import TokenVerifier from './jwt/tokenVerifier';
 // my bad simple version of dependency injection (I'm lazy)
 const encoder: Encoder = new Encoder();
 const decoder: Decoder = new Decoder();
-const tokFactory: TokenFactory = new TokenFactory(encoder);
-const tokVerifier: TokenVerifier = new TokenVerifier();
-const idController: IdentityController = new IdentityController(
-  tokFactory,
-  tokVerifier,
-  decoder
-);
-const dataController: DataController = new DataController(
-  tokFactory,
-  tokVerifier,
-  decoder
-);
+const hs256Handler: HS256Handler = new HS256Handler();
+const mediator: HashMediator = new HashMediator(hs256Handler);
 
+const tokFactory: TokenFactory = new TokenFactory(encoder, mediator);
+const tokVerifier: TokenVerifier = new TokenVerifier(decoder, mediator);
+
+const idService = new IdentityService(tokFactory, tokVerifier);
+const userService = new UserService();
+
+const idController: IdentityController = new IdentityController(
+  idService,
+  userService
+);
+const dataController: DataController = new DataController(idService);
+
+// to easily print the result of authentication
 const printOrNullError = (jwtToken: JwtToken | null): void => {
   if (jwtToken === null) {
     console.log('Null token. Error in registration');

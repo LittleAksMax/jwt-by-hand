@@ -17,9 +17,9 @@ class TokenFactory implements ITokenFactory {
   private _encoder: Encoder;
   private _mediator: HashMediator;
 
-  constructor(encoder: Encoder) {
+  constructor(encoder: Encoder, mediator: HashMediator) {
     this._encoder = encoder;
-    this._mediator = new HashMediator();
+    this._mediator = mediator;
   }
 
   create = (

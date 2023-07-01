@@ -1,4 +1,3 @@
-import { Decoder } from '../../jwt/coders';
 import JwtToken from '../../jwt/token';
 import TokenFactory from '../../jwt/tokenFactory';
 import TokenVerifier from '../../jwt/tokenVerifier';
@@ -9,12 +8,8 @@ import productData from './productDatabase';
 class DataController {
   private _idService: IdentityService;
 
-  constructor(
-    tokFactory: TokenFactory,
-    tokVerifier: TokenVerifier,
-    decoder: Decoder
-  ) {
-    this._idService = new IdentityService(tokFactory, tokVerifier, decoder);
+  constructor(idService: IdentityService) {
+    this._idService = idService;
   }
 
   // this is meant to simulate an endpoint requiring authorization
