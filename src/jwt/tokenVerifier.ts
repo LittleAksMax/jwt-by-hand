@@ -1,13 +1,12 @@
+import { Header, Payload } from '../types/token';
 import { Encoder } from './coders';
 import { IHashHandler } from './hashHandlers';
 import HashMediator from './hashMediator';
 
 class TokenVerifier {
-  private _encoder: Encoder;
   private _mediator: HashMediator;
 
-  constructor(encoder: Encoder) {
-    this._encoder = encoder;
+  constructor() {
     this._mediator = new HashMediator();
   }
 
@@ -27,14 +26,19 @@ class TokenVerifier {
     header: string,
     payload: string,
     signatureToCompareTo: string,
-    hashType: string,
+    headerObj: Header,
+    payloadObj: Payload,
     secretKey: string,
     base64EncodeSecretKey: boolean = false
   ): boolean => {
     const toHash: string = `${header}.${payload}`;
 
-    const hashHandler: IHashHandler | null =
-      this._mediator.provideHandler(hashType);
+    const expired: boolean =
+      Math.floor(Date.now() / 1000) > payloadObj.iat + payloadObj.exp; // / 1000 to get millisec -> sec
+
+    const hashHandler: IHashHandler | null = this._mediator.provideHandler(
+      headerObj.alg
+    );
 
     const generatedSignature: string = hashHandler.hash(
       toHash,
@@ -43,7 +47,7 @@ class TokenVerifier {
         : Buffer.from(secretKey)
     );
 
-    return signatureToCompareTo === generatedSignature;
+    return signatureToCompareTo === generatedSignature && !expired;
   };
 }
 

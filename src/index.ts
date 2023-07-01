@@ -1,5 +1,6 @@
 import IdentityController from './api/auth/identityController';
 import DataController from './api/data/dataController';
+import { Data } from './api/data/models';
 import { Decoder, Encoder } from './jwt/coders';
 import JwtToken from './jwt/token';
 import TokenFactory from './jwt/tokenFactory';
@@ -9,7 +10,7 @@ import TokenVerifier from './jwt/tokenVerifier';
 const encoder: Encoder = new Encoder();
 const decoder: Decoder = new Decoder();
 const tokFactory: TokenFactory = new TokenFactory(encoder);
-const tokVerifier: TokenVerifier = new TokenVerifier(encoder);
+const tokVerifier: TokenVerifier = new TokenVerifier();
 const idController: IdentityController = new IdentityController(
   tokFactory,
   tokVerifier,
@@ -29,31 +30,82 @@ const printOrNullError = (jwtToken: JwtToken | null): void => {
   }
 };
 
-const jwtToken: JwtToken | null = idController.register(
-  'test.email@testemail.com',
-  'StrongPassword123!'
-);
+// so I can sleep the thread
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-// prints out token
-printOrNullError(jwtToken);
+const main = async () => {
+  console.log('register');
 
-// re-registering with same credentials
-const jwtToken2: JwtToken | null = idController.register(
-  'test.email@testemail.com',
-  'StrongPassword123!'
-);
+  const jwtToken: JwtToken | null = idController.register(
+    'test.email@testemail.com',
+    'StrongPassword123!'
+  );
 
-// prints out null token error.
-printOrNullError(jwtToken2);
+  // prints out token
+  printOrNullError(jwtToken);
 
-const jwtTokenSignIn: JwtToken | null = idController.signIn(
-  'test.email@testemail.com',
-  'StrongPassword123!'
-);
+  await sleep(1000);
+  console.log('\nre-register to original');
 
-// prints out token with different signature to original
-// as new token assigned
-printOrNullError(jwtTokenSignIn);
+  // re-registering with same credentials
+  const jwtToken2: JwtToken | null = idController.register(
+    'test.email@testemail.com',
+    'StrongPassword123!'
+  );
 
-// ! since jwtToken can't be null
-console.log(dataController.getData(jwtToken!));
+  // prints out null token error.
+  printOrNullError(jwtToken2);
+
+  await sleep(1000);
+  console.log('\nSign-in to original');
+
+  const jwtTokenSignIn: JwtToken | null = idController.signIn(
+    'test.email@testemail.com',
+    'StrongPassword123!'
+  );
+
+  // prints out token with different signature to original
+  // as new token assigned
+  printOrNullError(jwtTokenSignIn);
+
+  await sleep(1000);
+  console.log('\nAdmin sign-in');
+
+  // ! since jwtToken can't be null
+  console.log(dataController.getData(jwtToken!));
+
+  const adminJwt: JwtToken | null = idController.signIn(
+    'adminuser@test.com',
+    'adm1np$ss123!'
+  );
+
+  printOrNullError(adminJwt);
+
+  await sleep(1000);
+  console.log('\nNon-admin create data');
+
+  const newData: Data = {
+    sku: 'PRODUCT-FOUR-PURPLE-40',
+    brand: 'another brand',
+    price: 19.99,
+    qty: 1,
+  };
+
+  console.log(dataController.addData(jwtToken!, newData));
+
+  console.log('\nAdmin create data');
+  console.log(dataController.addData(adminJwt!, newData));
+
+  await sleep(5000);
+  console.log('\nAdmin creating new data later');
+
+  const newData2: Data = {
+    sku: 'PRODUCT-FIVE-YELLOW-41',
+    brand: 'some brand',
+    price: 29.99,
+    qty: 2,
+  };
+
+  console.log(dataController.addData(adminJwt!, newData2)); // invalid since expired
+};
+main();

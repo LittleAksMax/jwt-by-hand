@@ -8,10 +8,12 @@ export type Header = {
 
 export type Payload = {
   // below are (technically) not necessary fields but highly recommended
-  //sub: string; // subject of the token
-  //iss: string; // issuer of the token
-  //exp: number; // expiration time
-  //iat: number; // issued at
-  //aud: string; // audience
-  //jti: string; // JWT ID
+  sub: string; // subject of the token
+  iss: string; // issuer of the token
+  exp: number; // expiration time
+  iat: number; // issued at
+  aud: string; // audience
+  jti: string; // JWT ID
+  eml: string; // email of user
+  roles: string[]; // list of roles of client
 };

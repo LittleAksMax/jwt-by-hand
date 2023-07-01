@@ -30,6 +30,10 @@ class UserService {
 
     return user;
   };
+
+  // IMPORTANT!: it would be good to implement an authorised
+  //             endpoint to modify that only the root user
+  //             or someone with higher clearance
 }
 
 export default UserService;

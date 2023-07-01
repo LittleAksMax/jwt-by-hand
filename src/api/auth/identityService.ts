@@ -33,16 +33,32 @@ class IdentityService {
     const signature: string = jwtToken.signature;
 
     const headerObj: Header = JSON.parse(this._decoder.base64UrlDecode(header));
+    const payloadObj: Payload = JSON.parse(
+      this._decoder.base64UrlDecode(payload)
+    );
 
     const verified: boolean = this._tokVerifier.verify(
       header,
       payload,
       signature,
-      headerObj.alg,
+      headerObj,
+      payloadObj,
       this._secretKey
     );
 
     return verified;
+  };
+
+  public verifyRole = (jwtToken: JwtToken, role: string): boolean => {
+    const payload: string = jwtToken.payload;
+    const payloadObj: Payload = JSON.parse(
+      this._decoder.base64UrlDecode(payload)
+    );
+
+    // there should be exactly 1 match for the role
+    return (
+      payloadObj.roles.filter((roleName) => roleName === role).length === 1
+    );
   };
 
   public signToken = (user: User): JwtToken => {
@@ -54,13 +70,14 @@ class IdentityService {
     const payload: Payload = {
       sub: user.id,
       iss: 'issuer',
-      exp: 1200,
-      iat: Date.now() / 1000, // /1000 to get millisec -> sec
+      exp: 5, // usually 1200 for 20 mins
+      iat: Math.floor(Date.now() / 1000), // / 1000 to get millisec -> sec
       aud: 'audience',
       jti: uuidv4(),
 
       // other flags of my own for user claims
       eml: user.email,
+      roles: [],
     };
 
     return this._tokFactory.create(header, payload, this._secretKey);
