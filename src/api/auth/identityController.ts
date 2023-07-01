@@ -1,7 +1,4 @@
-import { Decoder } from '../../jwt/coders';
 import JwtToken from '../../jwt/token';
-import TokenFactory from '../../jwt/tokenFactory';
-import TokenVerifier from '../../jwt/tokenVerifier';
 import IdentityService from './identityService';
 import { User } from './models';
 import UserService from './userService';
@@ -10,13 +7,9 @@ class IdentityController {
   private _idService: IdentityService;
   private _userService: UserService;
 
-  constructor(
-    tokFactory: TokenFactory,
-    tokVerifier: TokenVerifier,
-    decoder: Decoder
-  ) {
-    this._idService = new IdentityService(tokFactory, tokVerifier, decoder);
-    this._userService = new UserService();
+  constructor(idService: IdentityService, userService: UserService) {
+    this._idService = idService;
+    this._userService = userService;
   }
 
   register = (email: string, password: string): JwtToken | null => {
@@ -46,10 +39,6 @@ class IdentityController {
 
     const token = this._idService.signToken(existingUser);
     return token;
-  };
-
-  refresh = () => {
-    throw new Error('Not implemented');
   };
 }
 

@@ -1,13 +1,15 @@
 import { Header, Payload } from '../types/token';
-import { Encoder } from './coders';
+import { Decoder } from './coders';
 import { IHashHandler } from './hashHandlers';
 import HashMediator from './hashMediator';
 
 class TokenVerifier {
+  private _decoder: Decoder;
   private _mediator: HashMediator;
 
-  constructor() {
-    this._mediator = new HashMediator();
+  constructor(decoder: Decoder, mediator: HashMediator) {
+    this._decoder = decoder;
+    this._mediator = mediator;
   }
 
   /**
@@ -26,12 +28,15 @@ class TokenVerifier {
     header: string,
     payload: string,
     signatureToCompareTo: string,
-    headerObj: Header,
-    payloadObj: Payload,
     secretKey: string,
     base64EncodeSecretKey: boolean = false
   ): boolean => {
     const toHash: string = `${header}.${payload}`;
+
+    const headerObj: Header = JSON.parse(this._decoder.base64UrlDecode(header));
+    const payloadObj: Payload = JSON.parse(
+      this._decoder.base64UrlDecode(payload)
+    );
 
     const expired: boolean =
       Math.floor(Date.now() / 1000) > payloadObj.iat + payloadObj.exp; // / 1000 to get millisec -> sec
@@ -48,6 +53,17 @@ class TokenVerifier {
     );
 
     return signatureToCompareTo === generatedSignature && !expired;
+  };
+
+  public verifyRole = (payload: string, role: string): boolean => {
+    const payloadObj: Payload = JSON.parse(
+      this._decoder.base64UrlDecode(payload)
+    );
+
+    // there should be exactly 1 match for the role
+    return (
+      payloadObj.roles.filter((roleName) => roleName === role).length === 1
+    );
   };
 }
 
